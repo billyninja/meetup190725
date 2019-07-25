@@ -12,9 +12,9 @@ import (
 
 var WorkDir = flag.String("dir", "-", "Working directory for all medias")
 
-func sample01(wdir string) error {
+func sample01(wdir string, n int) error {
     var mainImg string = "seagull.jpg"
-    var secImg string = "wmark.png"
+    var secImg string = "pp-completa-branca.svg"
 
     mainImgPath := filepath.Join(wdir, "src", mainImg)
     mainSurf, err := img.Load(mainImgPath)
@@ -31,11 +31,21 @@ func sample01(wdir string) error {
     rdr, _ := sdl.CreateSoftwareRenderer(mainSurf)
     secTex, _ := rdr.CreateTextureFromSurface(secSurf)
 
-    rdr.Copy(
-        secTex,                                // WHO
-        &sdl.Rect{0, 0, secSurf.W, secSurf.H}, // SRC
-        &sdl.Rect{0, 0, 60, 60},               // DEST
-    )
+    srcRect := &sdl.Rect{0, 0, secSurf.W, secSurf.H}
+
+    for i := 1; i < n; i++ {
+        dstRect := &sdl.Rect{
+            (mainSurf.W - secSurf.W) - 10,
+            int32(i) * secSurf.H,
+            secSurf.W,
+            secSurf.H,
+        }
+        rdr.Copy(
+            secTex,  // WHO
+            srcRect, // SRC
+            dstRect, // DEST
+        )
+    }
 
     distPath := filepath.Join(wdir, "dist", "sample01.png")
     err = img.SavePNG(mainSurf, distPath)
@@ -97,7 +107,7 @@ func main() {
     }
 
     ttf.Init()
-    if err := sample01(wdir); err != nil {
+    if err := sample01(wdir, 5); err != nil {
         log.Fatalf("Failed on sample01: %+v", err)
     }
     if err := sample02(wdir); err != nil {
