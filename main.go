@@ -6,6 +6,7 @@ import (
     "github.com/veandco/go-sdl2/sdl"
     "github.com/veandco/go-sdl2/ttf"
     "log"
+    "os"
     "path/filepath"
 )
 
@@ -63,9 +64,6 @@ func sample02(wdir string) error {
     rdr, _ := sdl.CreateSoftwareRenderer(mainSurf)
     ttex, _ := rdr.CreateTextureFromSurface(tsurf)
 
-    //centerX := (mainSurf.W / 2) - (tsurf.W / 2)
-    //centerY := (mainSurf.H / 2) - (tsurf.H / 2)
-
     ntimesY := int(mainSurf.H/tsurf.H) - 1
     ntimesX := int(mainSurf.W/tsurf.W) - 1
 
@@ -88,6 +86,16 @@ func sample02(wdir string) error {
 func main() {
     flag.Parse()
     wdir := *WorkDir
+
+    fi, err := os.Stat(wdir)
+    if err != nil {
+        log.Fatalf("%+v", err)
+    } else {
+        if !fi.Mode().IsDir() {
+            log.Fatalf("%s is not a directory!", wdir)
+        }
+    }
+
     ttf.Init()
     if err := sample01(wdir); err != nil {
         log.Fatalf("Failed on sample01: %+v", err)
